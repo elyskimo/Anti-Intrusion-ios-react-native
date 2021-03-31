@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import type {Node} from 'react';
 import {
   SafeAreaView,
@@ -30,15 +30,57 @@ import SignUp from './src/screens/SignUp';
 import SignIn from './src/screens/SignIn';
 import LoadingScreen from './src/screens/Loading';
 import Dashboard from './src/screens/Dashboard';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import {useNavigation} from '@react-navigation/native';
 
 const Stack = createStackNavigator();
 
 const App: () => Node = () => {
+  const [permissions, setPermissions] = useState({});
   let persistor = persistStore(Store);
   if (!firebase.apps.length) {
     firebase.initializeApp(apiKeys.firebaseConfig);
     console.log('Connected with Firebase');
   }
+
+  useEffect(() => {
+    PushNotificationIOS.addEventListener('notification', onRemoteNotification);
+  });
+
+  const onRemoteNotification = notification => {
+    const isClicked = notification.getData().userInteraction === 1;
+    const actionIdentifier = notification.getActionIdentifier();
+
+    if (actionIdentifier === 'open') {
+      // Perform action based on open action
+      return <Dashboard showPinLock={true} />;
+    }
+
+    if (isClicked) {
+      // Navigate user to another screen
+      // const navigation = useNavigation();
+      // navigation.replace('Dashboard',{});
+      return <Dashboard showPinLock={true} />;
+    } else {
+      // Do something else with push notification
+    }
+  };
+
+  const setNotificationCategories = () => {
+    PushNotificationIOS.setNotificationCategories([
+      {
+        id: 'userAction',
+        actions: [
+          {id: 'open', title: 'Open', options: {foreground: true}},
+          {
+            id: 'ignore',
+            title: 'Desruptive',
+            options: {foreground: true, destructive: true},
+          },
+        ],
+      },
+    ]);
+  };
 
   return (
     <Provider store={Store}>

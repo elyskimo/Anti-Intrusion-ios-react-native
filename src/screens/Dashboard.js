@@ -104,6 +104,7 @@ const Dashboard = props => {
           <View style={styles.container}>
             <PINCode
               status={PINCodeStatus}
+              passwordLength={6}
               touchIDDisabled={true}
               finishProcess={() => _finishProcess()}
               lockedPage={false}
@@ -114,7 +115,7 @@ const Dashboard = props => {
               titleAttemptFailed={'Code pas bon'}
               subtitleError={'Veuillez réessayer'}
               titleConfirmFailed={'Les codes ne correspondent pas'}
-              titleEnter={'Rentrez votre code PIN'}
+              titleEnter={'Rentrez le code'}
               subtitleEnter={"pour désactiver l'alarme"}
               colorCircleButtons={'#ff9999'}
               colorPassword={'#ff9999'}
