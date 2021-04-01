@@ -9,6 +9,8 @@ import PINCode, {hasUserSetPinCode} from '@haskkor/react-native-pincode';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {connectUser, disconnectUser} from '@redux/user/actions';
+import messaging from '@react-native-firebase/messaging';
+import {log} from 'react-native-reanimated';
 
 const Dashboard = props => {
   const {connectUser, disconnectUser, user} = props;
@@ -39,6 +41,71 @@ const Dashboard = props => {
       }
     }
   });
+
+  async function requestUserPermission() {
+    const authorizationStatus = await messaging().requestPermission();
+
+    if (authorizationStatus) {
+      console.log('Permission status:', authorizationStatus);
+    }
+  }
+
+  const register = (onRegister, onNotification, onOpenNotification) => {
+    this.checkPermission(onRegister);
+    this.createNotificationListeners(
+      onRegister,
+      onNotification,
+      onOpenNotification,
+    );
+  };
+
+  const registerAppWithFCM = async () => {
+    await messaging().registerDeviceForRemoteMessages();
+    await messaging().setAutoInitEnabled();
+  };
+
+  const checkPermission = onRegister => {
+    messaging()
+      .hasPermission()
+      .then(enabled => {
+        if (enabled) {
+          this.getToken(onRegister);
+        } else {
+          this.requestPermission(onRegister);
+        }
+      })
+      .catch(err => console.log('Permission rejected ', err));
+  };
+
+  const getToken = onRegister => {
+    messaging()
+      .getToken()
+      .then(fcmToken => {
+        if (fcmToken) {
+          onRegister(fcmToken);
+        } else {
+          console.log('No token');
+        }
+      })
+      .catch(err => console.log('getToken rejected ', err));
+  };
+
+  const requestPermission = onRegister => {
+    messaging()
+      .requestPermission()
+      .then(() => {
+        this.getToken(onRegister);
+      })
+      .catch(err => console.log('requestPermission rejected', err));
+  };
+
+  const deleteToken = () => {
+    messaging()
+      .deleteToken()
+      .catch(err => {
+        console.log('Delete token error', err);
+      });
+  };
 
   const handlePress = async () => {
     // await loggingOut();
@@ -135,11 +202,11 @@ const Dashboard = props => {
         <View style={styles.container}>
           <Text style={styles.titleText}>Accueil</Text>
           <Text style={styles.text}>Bonjour {firstName}</Text>
-          <TouchableOpacity style={styles.button} onPress={_showChoosePinLock}>
-            <Text style={styles.buttonText}>Définir un code PIN</Text>
-          </TouchableOpacity>
+          {/*<TouchableOpacity style={styles.button} onPress={_showChoosePinLock}>*/}
+          {/*  <Text style={styles.buttonText}>Définir un code PIN</Text>*/}
+          {/*</TouchableOpacity>*/}
           <TouchableOpacity style={styles.button} onPress={_showEnterPinLock}>
-            <Text style={styles.buttonText}>Entrez le code PIN</Text>
+            <Text style={styles.buttonText}>Désactiver l'alarme</Text>
           </TouchableOpacity>
           <View style={styles.spacer} />
           <TouchableOpacity style={styles.button} onPress={handlePress}>

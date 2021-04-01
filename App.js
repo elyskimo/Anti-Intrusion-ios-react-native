@@ -46,6 +46,33 @@ const App: () => Node = () => {
   useEffect(() => {
     PushNotificationIOS.addEventListener('notification', onRemoteNotification);
   });
+  // let mqtt = require('mqtt');
+  //On publie :
+  //mosquitto_sub -h 62.210.73.175 -t "YNOV/BDX/#" -p 8880
+  //mosquitto_pub -h 62.210.73.175 -t "YNOV/BDX" -m "Hello MQTT World" -p 8880 -u "equipe7" -P "equipe7"
+  //
+  // On attends :
+  // mosquitto_sub -h 62.210.73.175 -t "YNOV/BDX/#" -p 8880
+  // Hello MQTT World
+  // let client = mqtt.connect({
+  //   servers: [{host: '62.210.73.175', port: 8880, protocol: 'mqtt'}],
+  //   username: 'equipe7',
+  //   password: 'equipe7',
+  // });
+  //
+  // client.on('connect', function () {
+  //   client.subscribe('YNOV/BDX/#', function (err) {
+  //     if (!err) {
+  //       client.publish('YNOV/BDX/#', 'Hello mqtt wass poppin');
+  //     }
+  //   });
+  // });
+
+  // client.on('message', function (topic, message) {
+  //   // message is Buffer
+  //   console.log(message.toString());
+  //   client.end();
+  // });
 
   const onRemoteNotification = notification => {
     const isClicked = notification.getData().userInteraction === 1;
